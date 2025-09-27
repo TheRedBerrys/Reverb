@@ -27,14 +27,14 @@ The game ends when your "Completions" counter hits 3. Your score is the number i
    * You have no card that matches the last card
    * You decide not to play any more cards
   
-# Draw Cards
+## Draw Cards
 
 1. After playing a Draw, immediately place the next card from the deck as the new last card in the queue.
 2. If this play lets you continue (if your Draw card matched both of the last two cards in the queue), proceed with your turn.
 3. If not, begin your next turn by placing another card from the deck as the new last card.
 4. If a newly drawn queue card is a Draw, immediately add one card to your hand before continuing your turn (or starting your next turn).
 
-# Matching
+## Matching Rules
 
 Each card has two items. You can play any card if either item matches either item on the last card played.
 
@@ -58,7 +58,7 @@ Null matches nothing, including another null or a wild
 
 ![alt text](images/readme/readme5.png)
 
-# Double-Matching
+## Double-Matching Rules
 
 If your card has one item that matches the last card, and the other item matches the next-to-last card, you get to play again!
 
@@ -84,7 +84,7 @@ Remember that you can’t play at all if your card doesn’t match something on 
 
 ![alt text](images/readme/readme8.png)
 
-# Reverse Matching
+## Reverse Matching
 
 In a reverse-matching turn, you may _not_ play a card if it matches the last card.
 
