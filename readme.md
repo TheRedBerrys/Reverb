@@ -19,7 +19,7 @@ The game ends when your "Completions" counter hits 3. Your score is the number i
    * Each play shifts the queue forward (last → second-to-last). The card you just played becomes the new last card.
 4. If you play your last card, the "Completions" counter goes up.
    * If your card matches both the last card and the next-to-last card, you draw seven new cards and your turn continues.
-   * If not, your turn ends and 
+   * If not, your turn ends, but you still draw seven new cards before your next turn starts.
 5. Your turn ends and the "Turns" counter goes up when one of the following happens:
    * You play a card that matches the last card, but not the next-to-last card
    * You have no card that matches the last card
@@ -30,15 +30,47 @@ The game ends when your "Completions" counter hits 3. Your score is the number i
 Each card has two items. You can play any card if either item matches either item on the last card played.
 
 Numbers match themselves (but not other numbers)
-  
+
+![alt text](images/readme/readme1.png)
 
 Ranges (1-4 and 4-7) match numbers they contain but not other ranges.
 
+![alt text](images/readme/readme2.png)
 
 Draw matches another draw (and wild), but not numbers or ranges. When you play a draw card, each player (except you) draws one card from the draw pile into their hand.
 
+![alt text](images/readme/readme3.png)
 
 Wild matches any number, range, or draw
 
+![alt text](images/readme/readme4.png)
 
 Null matches nothing, including another null or a wild
+
+![alt text](images/readme/readme5.png)
+
+# Double-Matching
+
+If your card has one item that matches the last card, and the other item matches the next-to-last card, you get to play again!
+
+![alt text](images/readme/readme6.png)
+
+When this happens, your next card can double-match again on what are now the two last cards! You can keep it going as long as you can match the last two cards.
+
+![alt text](images/readme/readme7.png)
+
+A null doesn’t prevent double-matching, as long as both items on your card can match the last two cards.
+
+![alt text](images/readme/readme9.png)
+
+A null does not match a wild, so it can prevent a double-match if your card’s other item doesn’t match something on the last two cards. You are allowed to play this card, but it ends your turn.
+
+![alt text](images/readme/readme10.png)
+
+To double-match, one item has to match the last card, and the other item has to match the next-to-last card. The same item can’t match both cards. You are allowed to play this card, but it ends your turn.
+
+![alt text](images/readme/readme8.png)
+
+Remember that you can’t play at all if your card doesn’t match something on the last card, even if it matches the next-to-last card.
+
+![alt text](images/readme/readme11.png)
