@@ -26,6 +26,13 @@ The game ends when your "Completions" counter hits 3. Your score is the number i
    * You play a card that matches the last card, but not the next-to-last card
    * You have no card that matches the last card
    * You decide not to play any more cards
+  
+# Draw Cards
+
+1. After playing a Draw, immediately place the next card from the deck as the new last card in the queue.
+2. If this play lets you continue (if your Draw card matched both of the last two cards in the queue), proceed with your turn.
+3. If not, begin your next turn by placing another card from the deck as the new last card.
+4. If a newly drawn queue card is a Draw, immediately add one card to your hand before continuing your turn (or starting your next turn).
 
 # Matching
 
