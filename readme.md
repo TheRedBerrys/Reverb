@@ -13,14 +13,16 @@ The game ends when your "Completions" counter hits 3. Your score is the number i
 ## On Your Turn
 
 1. Draw (optional/if stuck): Take 1 card from the draw pile.
-2. Play: Place a card matching at least one item on the last card in the queue.
-3. Reverb: If the other item also matches the second-to-last card, immediately play again.
+2. Once per game, you may decide to use Reverse rules, wherein you may play a card only if it _doesn't_ match the last card.
+   * See the section below on reverse matching rules
+4. Play: Place a card matching at least one item on the last card in the queue.
+5. Reverb: If the other item also matches the second-to-last card, immediately play again.
    * Keep chaining as long as you can.
    * Each play shifts the queue forward (last → second-to-last). The card you just played becomes the new last card.
-4. If you play your last card, the "Completions" counter goes up.
+6. If you play your last card, the "Completions" counter goes up.
    * If your card matches both the last card and the next-to-last card, you draw seven new cards and your turn continues.
    * If not, your turn ends, but you still draw seven new cards before your next turn starts.
-5. Your turn ends and the "Turns" counter goes up when one of the following happens:
+7. Your turn ends and the "Turns" counter goes up when one of the following happens:
    * You play a card that matches the last card, but not the next-to-last card
    * You have no card that matches the last card
    * You decide not to play any more cards
