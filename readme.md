@@ -76,3 +76,17 @@ To double-match, one item has to match the last card, and the other item has to 
 Remember that you can’t play at all if your card doesn’t match something on the last card, even if it matches the next-to-last card.
 
 ![alt text](images/readme/readme8.png)
+
+# Reverse Matching
+
+In a reverse-matching turn, you may _not_ play a card if it matches the last card.
+
+![alt text](images/readme/readme12.png)
+
+If your card does not match the last card, but does match the next-to-last card, you may play, but it ends your turn.
+
+![alt text](images/readme/readme14.png)
+
+If your card matches nothing on the last card, and also matches nothing on the next-to-last card, you may continue your turn.
+
+![alt text](images/readme/readme13.png)
