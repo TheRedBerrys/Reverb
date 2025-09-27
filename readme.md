@@ -69,8 +69,8 @@ A null does not match a wild, so it can prevent a double-match if your card’s 
 
 To double-match, one item has to match the last card, and the other item has to match the next-to-last card. The same item can’t match both cards. You are allowed to play this card, but it ends your turn.
 
-![alt text](images/readme/readme8.png)
+![alt text](images/readme/readme11.png)
 
 Remember that you can’t play at all if your card doesn’t match something on the last card, even if it matches the next-to-last card.
 
-![alt text](images/readme/readme11.png)
+![alt text](images/readme/readme8.png)
