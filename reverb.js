@@ -52,7 +52,10 @@ function drawCard() {
 
 function playCard(index) {
   let card = hand[index];
-  if (!canPlay(card)) return;
+  if (!canPlay(card)) {
+    animateInvalidCard(index);
+    return;
+  }
   hand.splice(index, 1);
   queue.push(card);
 
@@ -66,21 +69,44 @@ function playCard(index) {
   const isDouble = isDoubleMatch(card);
   console.log("isDoubleMatch:", isDouble, "reverseMode:", reverseMode);
 
-  // Check if played card has "d" (draw) - add next card from deck to queue
-  if (card.top === "d" || card.bottom === "d") {
-    if (deck.length > 0) {
-      const drawnCard = deck.pop();
-      queue.push(drawnCard);
-      console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
+  // Animate the played card, then continue with game logic after animation
+  animatePlayedCard(isDouble, () => {
+    // Check if played card has "d" (draw) - add next card from deck to queue
+    if (card.top === "d" || card.bottom === "d") {
+      if (deck.length > 0) {
+        const drawnCard = deck.pop();
+        queue.push(drawnCard);
+        console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
+      }
     }
-  }
 
-  if (reverseMode) {
-    console.log("In reverse mode");
-    if (!isDouble) {
-      console.log("Reverse mode: matches found, ending turn");
+    if (reverseMode) {
+      console.log("In reverse mode");
+      if (!isDouble) {
+        console.log("Reverse mode: matches found, ending turn");
+        turns++;
+        reverseMode = false; // Turn off reverse mode after turn ends
+
+        // Draw a card from the deck to the played queue
+        if (deck.length > 0) {
+          const drawnCard = deck.pop();
+          queue.push(drawnCard);
+          console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+        }
+        render();
+      } else {
+        console.log("Reverse mode: no matches, continuing");
+        render();
+        return; // can keep playing if nothing matched
+      }
+    } else if (isDouble) {
+      console.log("Normal mode: double match - allowing immediate play");
+      render();
+      return; // allow player to immediately play again
+    } else {
+      console.log("Normal mode: ending turn, turns before:", turns);
       turns++;
-      reverseMode = false; // Turn off reverse mode after turn ends
+      console.log("turns after increment:", turns);
 
       // Draw a card from the deck to the played queue
       if (deck.length > 0) {
@@ -88,29 +114,9 @@ function playCard(index) {
         queue.push(drawnCard);
         console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
       }
-    } else {
-      console.log("Reverse mode: no matches, continuing");
       render();
-      return; // can keep playing if nothing matched
     }
-  } else if (isDouble) {
-    console.log("Normal mode: double match - allowing immediate play");
-    render();
-    return; // allow player to immediately play again
-  } else {
-    console.log("Normal mode: ending turn, turns before:", turns);
-    turns++;
-    console.log("turns after increment:", turns);
-
-    // Draw a card from the deck to the played queue
-    if (deck.length > 0) {
-      const drawnCard = deck.pop();
-      queue.push(drawnCard);
-      console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
-    }
-  }
-
-  render();
+  });
 }
 
 function canPlay(card) {
@@ -190,6 +196,66 @@ function useReverse() {
   }
 }
 
+function updateCounterWithAnimation(elementId, newValue) {
+  const element = document.getElementById(elementId);
+  const oldValue = parseInt(element.innerText) || 0;
+
+  if (newValue > oldValue) {
+    // Add sunburst animation class
+    element.classList.add('sunburst');
+
+    // Remove the class after animation completes
+    setTimeout(() => {
+      element.classList.remove('sunburst');
+    }, 800);
+  }
+
+  element.innerText = newValue;
+}
+
+function animatePlayedCard(isDoubleMatch, callback) {
+  // Render first to show the played card
+  render();
+
+  // Wait a bit for the render to complete, then find and animate the last played card
+  setTimeout(() => {
+    const playedCards = document.querySelectorAll('#playedQueue img');
+    if (playedCards.length > 0) {
+      const lastCard = playedCards[playedCards.length - 1];
+
+      if (isDoubleMatch) {
+        lastCard.classList.add('greenSunburst');
+        setTimeout(() => {
+          lastCard.classList.remove('greenSunburst');
+          if (callback) callback();
+        }, 400);
+      } else {
+        lastCard.classList.add('yellowSunburst');
+        setTimeout(() => {
+          lastCard.classList.remove('yellowSunburst');
+          if (callback) callback();
+        }, 300);
+      }
+    } else {
+      // If no card found, call callback immediately
+      if (callback) callback();
+    }
+  }, 50);
+}
+
+function animateInvalidCard(cardIndex) {
+  // Find the card in the hand and animate it
+  const handCards = document.querySelectorAll('#hand img');
+  if (handCards[cardIndex]) {
+    const invalidCard = handCards[cardIndex];
+
+    invalidCard.classList.add('redSunburst');
+    setTimeout(() => {
+      invalidCard.classList.remove('redSunburst');
+    }, 400);
+  }
+}
+
 function render() {
   document.getElementById("hand").innerHTML = hand
     .map((c, i) => `<img src="${c.img}" class="card" onclick="playCard(${i})">`)
@@ -200,8 +266,8 @@ function render() {
     .map(c => `<img src="${c.img}" class="card" style="width:125px;height:175px">`)
     .join("");
 
-  document.getElementById("turns").innerText = turns;
-  document.getElementById("comps").innerText = completions;
+  updateCounterWithAnimation("turns", turns);
+  updateCounterWithAnimation("comps", completions);
   document.getElementById("drawCount").innerText = deck.length;
 
   // Update reverse button
