@@ -139,7 +139,7 @@ function playCard(index) {
           console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
           checkDrawEffect(drawnCard);
         }
-        render();
+        completeTurnWithCardRemoval();
       } else {
         console.log("Reverse mode: no matches, continuing");
         render();
@@ -161,7 +161,7 @@ function playCard(index) {
         console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
         checkDrawEffect(drawnCard);
       }
-      render();
+      completeTurnWithCardRemoval();
     }
   });
 }
@@ -331,6 +331,99 @@ function animateInvalidCard(cardIndex) {
   }
 }
 
+function animateOldCardsRemoval(callback) {
+  // Only animate if there are more than 2 cards in the queue
+  if (queue.length <= 2) {
+    if (callback) callback();
+    return;
+  }
+
+  const playedCards = document.querySelectorAll('#playedQueue img');
+  const cardsToRemove = playedCards.length - 2; // Keep last 2 cards
+
+  if (cardsToRemove <= 0) {
+    if (callback) callback();
+    return;
+  }
+
+  let animationsCompleted = 0;
+
+  // Animate the old cards (all except the last 2)
+  for (let i = 0; i < cardsToRemove; i++) {
+    const card = playedCards[i];
+    if (card) {
+      card.classList.add('yellowSunburst');
+      setTimeout(() => {
+        card.classList.add('fadeOut');
+        setTimeout(() => {
+          animationsCompleted++;
+          if (animationsCompleted === cardsToRemove) {
+            // Remove old cards from the queue array and re-render
+            queue = queue.slice(-2); // Keep only last 2 cards
+            render();
+            if (callback) callback();
+          }
+        }, 300); // Fade out duration
+      }, 300); // Yellow sunburst duration
+    } else {
+      animationsCompleted++;
+      if (animationsCompleted === cardsToRemove) {
+        queue = queue.slice(-2);
+        render();
+        if (callback) callback();
+      }
+    }
+  }
+}
+
+function renderWithoutTurnsUpdate() {
+  document.getElementById("hand").innerHTML = hand
+    .map((c, i) => `<img src="${c.img}" class="card" onclick="playCard(${i})">`)
+    .join("");
+
+  // Update played queue to show all cards
+  document.getElementById("playedQueue").innerHTML = queue
+    .map(c => `<img src="${c.img}" class="card">`)
+    .join("");
+
+  // Don't update turns counter - that will be done separately with animation
+  updateCounterWithAnimation("comps", completions);
+  document.getElementById("drawCount").innerText = deck.length;
+
+  // Update reverse button
+  const reverseBtn = document.getElementById("reverseBtn");
+  if (reverseMode) {
+    reverseBtn.disabled = false;
+    reverseBtn.className = "reverse";
+    reverseBtn.innerText = "Reverse Mode Active";
+  } else if (reverseUsed) {
+    reverseBtn.disabled = true;
+    reverseBtn.className = "secondary";
+    reverseBtn.innerText = "Reverse Used";
+  } else {
+    reverseBtn.disabled = false;
+    reverseBtn.className = "";
+    reverseBtn.innerText = "Use Reverse (once)";
+  }
+}
+
+function completeTurnWithCardRemoval() {
+  // First render to show the new card that was drawn to the queue (without updating turns counter)
+  renderWithoutTurnsUpdate();
+
+  // Wait for render to complete, then animate the turns counter
+  setTimeout(() => {
+    updateCounterWithAnimation("turns", turns);
+
+    // Then animate removal of old cards after the counter animation starts
+    setTimeout(() => {
+      animateOldCardsRemoval(() => {
+        // Final render after card removal is complete (though it should be handled in animateOldCardsRemoval)
+      });
+    }, 200); // Small delay to let the turns counter animation start
+  }, 50); // Small delay to ensure render is complete
+}
+
 function render() {
   document.getElementById("hand").innerHTML = hand
     .map((c, i) => `<img src="${c.img}" class="card" onclick="playCard(${i})">`)
@@ -376,7 +469,7 @@ function endTurn() {
   }
 
   console.log("turns after:", turns);
-  render();
+  completeTurnWithCardRemoval();
 }
 
 // Event listeners

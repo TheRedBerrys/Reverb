@@ -221,6 +221,22 @@
     .highlight-overlay.animate {
       animation: highlightPulse 1.2s ease-in-out;
     }
+
+    /* Fade out animation for removing old cards */
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+    }
+
+    .fadeOut {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
   </style>
 </head>
 <body>
