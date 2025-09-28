@@ -88,8 +88,42 @@ function playCard(index) {
   const isDouble = isDoubleMatch(card);
   console.log("isDoubleMatch:", isDouble, "reverseMode:", reverseMode);
 
+  // Check if this is a draw card (has "d")
+  const isDrawCard = card.top === "d" || card.bottom === "d";
+  console.log("isDrawCard:", isDrawCard);
+
   // Animate the played card, then continue with game logic after animation
   animatePlayedCard(isDouble, () => {
+
+    // Handle draw card effect first if it's a draw card
+    if (isDrawCard && deck.length > 0) {
+      const drawnCard = deck.pop();
+      queue.push(drawnCard);
+      console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
+
+      // Re-render to show the drawn card in the queue
+      render();
+
+      // Check if the draw card was a double-match to decide turn continuation
+      if (isDouble) {
+        console.log("Draw card was double-match, continuing turn");
+        return; // Allow player to continue playing
+      } else {
+        console.log("Draw card was not double-match, ending turn");
+        turns++;
+
+        // Draw another card to the queue for the normal turn ending
+        if (deck.length > 0) {
+          const secondDrawnCard = deck.pop();
+          queue.push(secondDrawnCard);
+          console.log("Turn ending: drew second card to queue:", secondDrawnCard.top, secondDrawnCard.bottom);
+          checkDrawEffect(secondDrawnCard);
+        }
+
+        completeTurnWithCardRemoval();
+        return;
+      }
+    }
 
     if (reverseMode) {
       console.log("In reverse mode");
