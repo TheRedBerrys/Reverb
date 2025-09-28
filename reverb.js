@@ -55,7 +55,6 @@ function playCard(index) {
   if (!canPlay(card)) return;
   hand.splice(index, 1);
   queue.push(card);
-  if (queue.length > 2) queue.shift();
 
   // Completion check
   if (hand.length === 0) {
@@ -64,21 +63,43 @@ function playCard(index) {
   }
 
   // Check for reverb chaining (double-match)
-  if (!reverseMode && isDoubleMatch(card)) {
+  const isDouble = isDoubleMatch(card);
+  console.log("isDoubleMatch:", isDouble, "reverseMode:", reverseMode);
+  if (!reverseMode && isDouble) {
+    console.log("Double match - allowing immediate play");
     render();
     return; // allow player to immediately play again
   }
 
   // In reverse mode: end turn if match to next-to-last, continue only if non-matching both
   if (reverseMode) {
-    if (matches(card, queue[queue.length - 2])) {
+    console.log("In reverse mode");
+    if (queue.length >= 2 && matches(card, queue[queue.length - 2])) {
+      console.log("Reverse mode: match to next-to-last, ending turn");
       turns++;
+
+      // Draw a card from the deck to the played queue
+      if (deck.length > 0) {
+        const drawnCard = deck.pop();
+        queue.push(drawnCard);
+        console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+      }
     } else {
+      console.log("Reverse mode: no match, continuing");
       render();
       return; // can keep playing if nothing matched
     }
   } else {
+    console.log("Normal mode: ending turn, turns before:", turns);
     turns++;
+    console.log("turns after increment:", turns);
+
+    // Draw a card from the deck to the played queue
+    if (deck.length > 0) {
+      const drawnCard = deck.pop();
+      queue.push(drawnCard);
+      console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+    }
   }
 
   render();
@@ -120,13 +141,33 @@ function isDoubleMatch(card) {
   const last = queue[queue.length - 2];
   const currentLast = queue[queue.length - 1];
 
-  const topMatchesLast = matches({top: card.top, bottom: card.top}, currentLast);
-  const bottomMatchesLast = matches({top: card.bottom, bottom: card.bottom}, currentLast);
-  const topMatchesPrev = matches({top: card.top, bottom: card.top}, last);
-  const bottomMatchesPrev = matches({top: card.bottom, bottom: card.bottom}, last);
+  console.log("Checking isDoubleMatch:");
+  console.log("Card:", card.top, card.bottom);
+  console.log("Previous card:", last.top, last.bottom);
+  console.log("Current last card:", currentLast.top, currentLast.bottom);
 
-  // one item must match current last, the other must match previous
-  return (topMatchesLast && bottomMatchesPrev) || (bottomMatchesLast && topMatchesPrev);
+  // Check if card's top matches ONLY currentLast and bottom matches ONLY last
+  const topMatchesOnlyLast = (matchItem(card.top, currentLast.top) || matchItem(card.top, currentLast.bottom)) &&
+                            !(matchItem(card.top, last.top) || matchItem(card.top, last.bottom));
+  const bottomMatchesOnlyPrev = (matchItem(card.bottom, last.top) || matchItem(card.bottom, last.bottom)) &&
+                               !(matchItem(card.bottom, currentLast.top) || matchItem(card.bottom, currentLast.bottom));
+
+  // Check if card's bottom matches ONLY currentLast and top matches ONLY last
+  const bottomMatchesOnlyLast = (matchItem(card.bottom, currentLast.top) || matchItem(card.bottom, currentLast.bottom)) &&
+                               !(matchItem(card.bottom, last.top) || matchItem(card.bottom, last.bottom));
+  const topMatchesOnlyPrev = (matchItem(card.top, last.top) || matchItem(card.top, last.bottom)) &&
+                            !(matchItem(card.top, currentLast.top) || matchItem(card.top, currentLast.bottom));
+
+  console.log("topMatchesOnlyLast:", topMatchesOnlyLast);
+  console.log("bottomMatchesOnlyPrev:", bottomMatchesOnlyPrev);
+  console.log("bottomMatchesOnlyLast:", bottomMatchesOnlyLast);
+  console.log("topMatchesOnlyPrev:", topMatchesOnlyPrev);
+
+  const result = (topMatchesOnlyLast && bottomMatchesOnlyPrev) || (bottomMatchesOnlyLast && topMatchesOnlyPrev);
+  console.log("isDoubleMatch result:", result);
+
+  // one item must match current last EXCLUSIVELY, the other must match previous EXCLUSIVELY
+  return result;
 }
 
 function useReverse() {
@@ -140,12 +181,43 @@ function render() {
   document.getElementById("hand").innerHTML = hand
     .map((c, i) => `<img src="${c.img}" class="card" onclick="playCard(${i})">`)
     .join("");
-  document.getElementById("queue").innerHTML = queue
-    .map(c => `<img src="${c.img}" class="card">`)
+
+  // Update played queue to show all cards
+  document.getElementById("playedQueue").innerHTML = queue
+    .map(c => `<img src="${c.img}" class="card" style="width:125px;height:175px">`)
     .join("");
+
   document.getElementById("turns").innerText = turns;
-  document.getElementById("completions").innerText = completions;
-  document.getElementById("deckCount").innerText = deck.length;
+  document.getElementById("comps").innerText = completions;
+  document.getElementById("drawCount").innerText = deck.length;
 }
+
+function endTurn() {
+  console.log("endTurn called, turns before:", turns);
+  turns++;
+
+  // Draw a card from the deck to the played queue
+  if (deck.length > 0) {
+    const drawnCard = deck.pop();
+    queue.push(drawnCard);
+    console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+  }
+
+  console.log("turns after:", turns);
+  render();
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOMContentLoaded fired");
+  const endBtn = document.getElementById('endBtn');
+  console.log("endBtn element:", endBtn);
+  if (endBtn) {
+    endBtn.addEventListener('click', endTurn);
+    console.log("endTurn event listener added");
+  }
+  document.getElementById('drawBtn').addEventListener('click', drawCard);
+  document.getElementById('reverseBtn').addEventListener('click', useReverse);
+});
 
 window.onload = startGame;
