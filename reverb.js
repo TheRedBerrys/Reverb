@@ -35,7 +35,14 @@ function shuffle(array) {
 function startGame() {
   deck = buildDeck();
   hand = deck.splice(0, 7);
-  queue = [deck.pop(), deck.pop()];
+  const firstCard = deck.pop();
+  const secondCard = deck.pop();
+  queue = [firstCard, secondCard];
+
+  // Check for draw effects on initial queue cards
+  checkDrawEffect(firstCard);
+  checkDrawEffect(secondCard);
+
   turns = 0;
   completions = 0;
   reverseUsed = false;
@@ -47,6 +54,17 @@ function drawCard() {
   if (deck.length > 0) {
     hand.push(deck.pop());
     render();
+  }
+}
+
+function checkDrawEffect(card) {
+  // Check if card has "d" (draw) - add next card from deck to player's hand
+  if (card.top === "d" || card.bottom === "d") {
+    if (deck.length > 0) {
+      const drawnCard = deck.pop();
+      hand.push(drawnCard);
+      console.log("Draw card in queue! Added card to hand:", drawnCard.top, drawnCard.bottom);
+    }
   }
 }
 
@@ -71,14 +89,6 @@ function playCard(index) {
 
   // Animate the played card, then continue with game logic after animation
   animatePlayedCard(isDouble, () => {
-    // Check if played card has "d" (draw) - add next card from deck to queue
-    if (card.top === "d" || card.bottom === "d") {
-      if (deck.length > 0) {
-        const drawnCard = deck.pop();
-        queue.push(drawnCard);
-        console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
-      }
-    }
 
     if (reverseMode) {
       console.log("In reverse mode");
@@ -92,6 +102,7 @@ function playCard(index) {
           const drawnCard = deck.pop();
           queue.push(drawnCard);
           console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+          checkDrawEffect(drawnCard);
         }
         render();
       } else {
@@ -113,6 +124,7 @@ function playCard(index) {
         const drawnCard = deck.pop();
         queue.push(drawnCard);
         console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+        checkDrawEffect(drawnCard);
       }
       render();
     }
@@ -297,6 +309,7 @@ function endTurn() {
     const drawnCard = deck.pop();
     queue.push(drawnCard);
     console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
+    checkDrawEffect(drawnCard);
   }
 
   console.log("turns after:", turns);
