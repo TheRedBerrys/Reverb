@@ -62,9 +62,18 @@ function playCard(index) {
     hand = deck.splice(0, 7);
   }
 
-  // Check for reverb chaining (double-match)
+  // Check for reverb chaining (double-match) BEFORE draw card effect
   const isDouble = isDoubleMatch(card);
   console.log("isDoubleMatch:", isDouble, "reverseMode:", reverseMode);
+
+  // Check if played card has "d" (draw) - add next card from deck to queue
+  if (card.top === "d" || card.bottom === "d") {
+    if (deck.length > 0) {
+      const drawnCard = deck.pop();
+      queue.push(drawnCard);
+      console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
+    }
+  }
 
   if (reverseMode) {
     console.log("In reverse mode");
