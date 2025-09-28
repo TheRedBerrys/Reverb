@@ -68,36 +68,6 @@ function checkDrawEffect(card) {
   }
 }
 
-function getNonMatchingPortion(card, previousCard) {
-  if (!previousCard) return null;
-
-  const topMatches = matchItem(card.top, previousCard.top) || matchItem(card.top, previousCard.bottom);
-  const bottomMatches = matchItem(card.bottom, previousCard.top) || matchItem(card.bottom, previousCard.bottom);
-
-  console.log("getNonMatchingPortion:", {
-    cardTop: card.top,
-    cardBottom: card.bottom,
-    prevTop: previousCard.top,
-    prevBottom: previousCard.bottom,
-    topMatches,
-    bottomMatches
-  });
-
-  // If both match, this should be a double-match case, return null
-  if (topMatches && bottomMatches) {
-    return null;
-  }
-
-  // Return the portion that doesn't match
-  if (topMatches && !bottomMatches) {
-    return "bottom";
-  } else if (!topMatches && bottomMatches) {
-    return "top";
-  }
-
-  // If neither matches, this shouldn't happen in a valid play, but return null
-  return null;
-}
 
 function playCard(index) {
   let card = hand[index];
@@ -118,12 +88,8 @@ function playCard(index) {
   const isDouble = isDoubleMatch(card);
   console.log("isDoubleMatch:", isDouble, "reverseMode:", reverseMode);
 
-  // Determine non-matching portion for animation (only for non-double-match cards)
-  const lastPlayedCard = queue.length > 1 ? queue[queue.length - 2] : null;
-  const nonMatchingPortion = isDouble ? null : getNonMatchingPortion(card, lastPlayedCard);
-
   // Animate the played card, then continue with game logic after animation
-  animatePlayedCard(isDouble, nonMatchingPortion, () => {
+  animatePlayedCard(isDouble, () => {
 
     if (reverseMode) {
       console.log("In reverse mode");
@@ -260,7 +226,7 @@ function updateCounterWithAnimation(elementId, newValue) {
   element.innerText = newValue;
 }
 
-function animatePlayedCard(isDoubleMatch, nonMatchingPortion, callback) {
+function animatePlayedCard(isDoubleMatch, callback) {
   // Render first to show the played card
   render();
 
@@ -277,39 +243,12 @@ function animatePlayedCard(isDoubleMatch, nonMatchingPortion, callback) {
           if (callback) callback();
         }, 400);
       } else {
-        // First apply the yellow sunburst for the normal play
+        // Apply the yellow sunburst for the normal play
         lastCard.classList.add('yellowSunburst');
-
-        // If there's a non-matching portion, add that highlight after the yellow
-        if (nonMatchingPortion) {
-          setTimeout(() => {
-            lastCard.classList.remove('yellowSunburst');
-
-            // Create and add highlight overlay
-            const overlay = document.createElement('div');
-            overlay.className = `highlight-overlay ${nonMatchingPortion} animate`;
-            overlay.style.position = 'absolute';
-            overlay.style.width = lastCard.offsetWidth + 'px';
-            overlay.style.height = (lastCard.offsetHeight / 2) + 'px';
-            overlay.style.left = lastCard.offsetLeft + 'px';
-            overlay.style.top = lastCard.offsetTop + (nonMatchingPortion === 'bottom' ? lastCard.offsetHeight / 2 : 0) + 'px';
-
-            lastCard.parentElement.appendChild(overlay);
-
-            // Remove overlay after animation
-            setTimeout(() => {
-              if (overlay.parentElement) {
-                overlay.parentElement.removeChild(overlay);
-              }
-              if (callback) callback();
-            }, 1200);
-          }, 300);
-        } else {
-          setTimeout(() => {
-            lastCard.classList.remove('yellowSunburst');
-            if (callback) callback();
-          }, 300);
-        }
+        setTimeout(() => {
+          lastCard.classList.remove('yellowSunburst');
+          if (callback) callback();
+        }, 300);
       }
     } else {
       // If no card found, call callback immediately
