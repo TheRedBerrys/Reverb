@@ -338,7 +338,7 @@ function render() {
 
   // Update played queue to show all cards
   document.getElementById("playedQueue").innerHTML = queue
-    .map(c => `<img src="${c.img}" class="card" style="width:125px;height:175px">`)
+    .map(c => `<img src="${c.img}" class="card">`)
     .join("");
 
   updateCounterWithAnimation("turns", turns);
