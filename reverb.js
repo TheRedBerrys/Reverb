@@ -6,6 +6,7 @@ let completions = 0;
 let reverseUsed = false;
 let reverseMode = false;
 let reverseButtonDisabled = false; // Track when reverse button is disabled during play
+let bestScore = null; // Best score (lowest turns to reach 3 completions)
 
 const topItems = ["1","2","3","4","5","6","7"];
 const bottomItems = ["1","2","3","4","5","6","7","1-4","4-7","w","d","n"];
@@ -49,6 +50,7 @@ function startGame() {
   reverseUsed = false;
   reverseMode = false;
   reverseButtonDisabled = false;
+  loadBestScore(); // Load best score from localStorage
   render();
 }
 
@@ -87,6 +89,8 @@ function playCard(index) {
   if (hand.length === 0) {
     completions++;
     hand = deck.splice(0, 7);
+
+    // Note: Score checking is done after turn increment in the turn-ending logic
   }
 
   // Check for reverb chaining (double-match) BEFORE draw card effect
@@ -121,6 +125,9 @@ function playCard(index) {
         turns++;
         reverseMode = false; // Turn off reverse mode when turn ends
 
+        // Check for best score after turn increment
+        checkAndUpdateBestScore();
+
         // Draw another card to the queue for the normal turn ending
         if (deck.length > 0) {
           const secondDrawnCard = deck.pop();
@@ -141,6 +148,9 @@ function playCard(index) {
         console.log("Reverse mode: matches found, ending turn");
         turns++;
         reverseMode = false; // Turn off reverse mode after turn ends
+
+        // Check for best score after turn increment
+        checkAndUpdateBestScore();
 
         // Draw a card from the deck to the played queue
         if (deck.length > 0) {
@@ -165,6 +175,9 @@ function playCard(index) {
       turns++;
       reverseMode = false; // Turn off reverse mode when turn ends
       console.log("turns after increment:", turns);
+
+      // Check for best score after turn increment
+      checkAndUpdateBestScore();
 
       // Draw a card from the deck to the played queue
       if (deck.length > 0) {
@@ -253,6 +266,43 @@ function useReverse() {
     reverseUsed = true;
     reverseMode = true;
     render();
+  }
+}
+
+function loadBestScore() {
+  try {
+    const saved = localStorage.getItem('reverbBestScore');
+    if (saved !== null) {
+      bestScore = parseInt(saved);
+    }
+  } catch (e) {
+    console.log('Could not load best score from localStorage');
+  }
+}
+
+function saveBestScore() {
+  try {
+    if (bestScore !== null) {
+      localStorage.setItem('reverbBestScore', bestScore.toString());
+    }
+  } catch (e) {
+    console.log('Could not save best score to localStorage');
+  }
+}
+
+function checkAndUpdateBestScore() {
+  if (completions >= 3) {
+    console.log(`Reached 3 completions! Current turns: ${turns}`);
+
+    // Update best score if this is better (lower) or if no best score exists
+    if (bestScore === null || turns < bestScore) {
+      bestScore = turns;
+      console.log(`New best score: ${bestScore}`);
+      saveBestScore();
+
+      // Add animation to the best score counter
+      updateCounterWithAnimation("bestScore", bestScore);
+    }
   }
 }
 
@@ -444,6 +494,14 @@ function render() {
   updateCounterWithAnimation("comps", completions);
   document.getElementById("drawCount").innerText = deck.length;
 
+  // Update best score display
+  const bestScoreElement = document.getElementById("bestScore");
+  if (bestScore === null) {
+    bestScoreElement.innerText = "--";
+  } else {
+    bestScoreElement.innerText = bestScore;
+  }
+
   // Update reverse button
   const reverseBtn = document.getElementById("reverseBtn");
   if (reverseMode) {
@@ -469,6 +527,9 @@ function endTurn() {
   console.log("endTurn called, turns before:", turns);
   turns++;
   reverseMode = false; // Turn off reverse mode when turn ends
+
+  // Check for best score after turn increment
+  checkAndUpdateBestScore();
 
   // Draw a card from the deck to the played queue
   if (deck.length > 0) {
