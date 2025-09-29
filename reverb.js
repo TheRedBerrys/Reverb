@@ -5,6 +5,7 @@ let turns = 0;
 let completions = 0;
 let reverseUsed = false;
 let reverseMode = false;
+let reverseButtonDisabled = false; // Track when reverse button is disabled during play
 
 const topItems = ["1","2","3","4","5","6","7"];
 const bottomItems = ["1","2","3","4","5","6","7","1-4","4-7","w","d","n"];
@@ -47,6 +48,7 @@ function startGame() {
   completions = 0;
   reverseUsed = false;
   reverseMode = false;
+  reverseButtonDisabled = false;
   render();
 }
 
@@ -78,6 +80,9 @@ function playCard(index) {
   hand.splice(index, 1);
   queue.push(card);
 
+  // Disable reverse button immediately when a card is played
+  disableReverseButtonDuringPlay();
+
   // Completion check
   if (hand.length === 0) {
     completions++;
@@ -101,6 +106,9 @@ function playCard(index) {
       queue.push(drawnCard);
       console.log("Draw card played! Added card to queue:", drawnCard.top, drawnCard.bottom);
 
+      // Check if the drawn card also has a draw effect
+      checkDrawEffect(drawnCard);
+
       // Re-render to show the drawn card in the queue
       render();
 
@@ -111,6 +119,7 @@ function playCard(index) {
       } else {
         console.log("Draw card was not double-match, ending turn");
         turns++;
+        reverseMode = false; // Turn off reverse mode when turn ends
 
         // Draw another card to the queue for the normal turn ending
         if (deck.length > 0) {
@@ -120,6 +129,7 @@ function playCard(index) {
           checkDrawEffect(secondDrawnCard);
         }
 
+        enableReverseButtonAfterTurn();
         completeTurnWithCardRemoval();
         return;
       }
@@ -139,6 +149,7 @@ function playCard(index) {
           console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
           checkDrawEffect(drawnCard);
         }
+        enableReverseButtonAfterTurn();
         completeTurnWithCardRemoval();
       } else {
         console.log("Reverse mode: no matches, continuing");
@@ -152,6 +163,7 @@ function playCard(index) {
     } else {
       console.log("Normal mode: ending turn, turns before:", turns);
       turns++;
+      reverseMode = false; // Turn off reverse mode when turn ends
       console.log("turns after increment:", turns);
 
       // Draw a card from the deck to the played queue
@@ -161,6 +173,7 @@ function playCard(index) {
         console.log("Drew card to played queue:", drawnCard.top, drawnCard.bottom);
         checkDrawEffect(drawnCard);
       }
+      enableReverseButtonAfterTurn();
       completeTurnWithCardRemoval();
     }
   });
@@ -241,6 +254,22 @@ function useReverse() {
     reverseMode = true;
     render();
   }
+}
+
+function disableReverseButtonDuringPlay() {
+  if (!reverseUsed && !reverseMode) {
+    reverseButtonDisabled = true;
+    const reverseBtn = document.getElementById("reverseBtn");
+    reverseBtn.disabled = true;
+    reverseBtn.className = "secondary";
+    reverseBtn.innerText = "Playing...";
+  }
+}
+
+function enableReverseButtonAfterTurn() {
+  // Re-enable the reverse button after turn ends
+  reverseButtonDisabled = false;
+  // The render function will handle updating the button state
 }
 
 function updateCounterWithAnimation(elementId, newValue) {
@@ -373,6 +402,10 @@ function renderWithoutTurnsUpdate() {
     reverseBtn.disabled = true;
     reverseBtn.className = "secondary";
     reverseBtn.innerText = "Reverse Used";
+  } else if (reverseButtonDisabled) {
+    reverseBtn.disabled = true;
+    reverseBtn.className = "secondary";
+    reverseBtn.innerText = "Playing...";
   } else {
     reverseBtn.disabled = false;
     reverseBtn.className = "";
@@ -421,6 +454,10 @@ function render() {
     reverseBtn.disabled = true;
     reverseBtn.className = "secondary";
     reverseBtn.innerText = "Reverse Used";
+  } else if (reverseButtonDisabled) {
+    reverseBtn.disabled = true;
+    reverseBtn.className = "secondary";
+    reverseBtn.innerText = "Playing...";
   } else {
     reverseBtn.disabled = false;
     reverseBtn.className = "";
@@ -442,6 +479,7 @@ function endTurn() {
   }
 
   console.log("turns after:", turns);
+  enableReverseButtonAfterTurn();
   completeTurnWithCardRemoval();
 }
 
