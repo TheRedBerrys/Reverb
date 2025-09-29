@@ -16,7 +16,13 @@
     }
 
     body{font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#071024, #07143a);color:#e6eef8;margin:0;padding:var(--padding)}
-    h1{margin:0 0 10px;font-size:20px}
+    h1{margin:0 0 15px;font-size:20px}
+
+    /* Top stats styling */
+    .top-stats{display:flex;gap:30px;justify-content:center;margin-bottom:20px;padding:15px;background:rgba(255,255,255,0.08);border-radius:12px;border:1px solid rgba(255,255,255,0.12)}
+    .stat-item{text-align:center}
+    .stat-label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+    .stat-value{font-size:32px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
     .app{display:grid;grid-template-columns:1fr;gap:20px}
     .panel{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
     .topbar{display:flex;gap:var(--gap);align-items:center;margin-bottom:var(--gap)}
@@ -26,8 +32,14 @@
     .board{display:flex;flex-direction:column;gap:12px}
     .queue{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
     #playedQueue{position:relative;display:flex;gap:var(--gap);flex-wrap:wrap;justify-content:flex-start}
+
+    /* Bordered sections */
+    .draw-pile-container{border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;background:rgba(255,255,255,0.02)}
+    .play-queue-container{border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;background:rgba(255,255,255,0.02);flex-grow:1}
+    .hand-container{border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;background:rgba(255,255,255,0.02)}
     .card{width:var(--card-width);height:var(--card-height);border-radius:8px;background:#fff;color:#000;display:flex;flex-direction:column;justify-content:center;align-items:center;font-weight:700}
-    .hand{display:flex;flex-wrap:wrap;gap:var(--gap);padding:var(--gap);justify-content:flex-start}
+    .hand{display:flex;flex-wrap:wrap;gap:var(--gap);justify-content:flex-start}
+    .hand-container .hand{padding:0}
     .hand .card{width:var(--card-width);height:var(--card-height);cursor:pointer}
     .stats{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
     .muted{color:var(--muted)}
@@ -53,12 +65,13 @@
       .panel{padding:8px}
       .board{gap:8px}
       .queue{gap:6px}
-      .hand{gap:var(--gap);padding:var(--gap)}
+      .draw-pile-container, .play-queue-container, .hand-container{padding:8px}
       button{padding:6px 8px;font-size:14px}
       .controls{gap:4px;margin-top:8px}
       .controls button{flex:1;min-width:0;font-size:12px}
-      .stats{gap:8px;font-size:12px}
       h1{font-size:18px}
+      .top-stats{gap:20px;padding:10px;margin-bottom:15px}
+      .stat-value{font-size:24px}
     }
 
     /* Small phones */
@@ -72,9 +85,11 @@
 
       .controls{flex-direction:column;align-items:stretch}
       .controls button{margin-bottom:4px}
-      .stats{flex-direction:column;gap:4px;text-align:center}
       .queue{gap:4px}
       #playedQueue{gap:var(--gap)}
+      .top-stats{gap:15px;padding:8px;margin-bottom:10px}
+      .stat-value{font-size:20px}
+      .draw-pile-container, .play-queue-container, .hand-container{padding:6px}
     }
 
     /* Large screens */
@@ -202,11 +217,24 @@
 </head>
 <body>
   <h1>Reverb</h1>
+
+  <!-- Prominent counters at the top -->
+  <div class="top-stats">
+    <div class="stat-item">
+      <div class="stat-label">Completions</div>
+      <div class="stat-value" id="comps">0</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Turns</div>
+      <div class="stat-value" id="turns">0</div>
+    </div>
+  </div>
+
   <div class="app">
     <div class="panel">
       <div class="board">
         <div class="queue">
-          <div class="stack">
+          <div class="draw-pile-container">
             <div class="small muted">Draw pile</div>
             <div id="drawPile" class="card" style="display:flex;align-items:center;justify-content:center;position:relative">
               <img src="images/back.png" class="card-img" style="position:absolute;top:0;left:0">
@@ -214,13 +242,13 @@
             </div>
           </div>
 
-          <div class="stack" style="flex-grow:1">
+          <div class="play-queue-container">
             <div class="small muted">Played cards</div>
             <div id="playedQueue"></div>
           </div>
         </div>
 
-        <div>
+        <div class="hand-container">
           <div class="small muted">Your hand</div>
           <div id="hand" class="hand"></div>
         </div>
@@ -229,10 +257,6 @@
           <button id="drawBtn" class="secondary">Draw (take 1)</button>
           <button id="reverseBtn">Use Reverse (once)</button>
           <button id="endBtn" class="secondary">End Turn</button>
-          <div style="margin-left:auto" class="stats">
-            <div class="small muted">Completions: <span id="comps">0</span></div>
-            <div class="small muted">Turns: <span id="turns">0</span></div>
-          </div>
         </div>
       </div>
     </div>
