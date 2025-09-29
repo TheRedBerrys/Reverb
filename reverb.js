@@ -167,6 +167,7 @@ function playCard(index) {
         return; // can keep playing if nothing matched
       }
     } else if (isDouble) {
+      checkAndUpdateBestScore();
       console.log("Normal mode: double match - allowing immediate play");
       render();
       return; // allow player to immediately play again
