@@ -638,7 +638,7 @@ function render() {
   } else {
     reverseBtn.disabled = false;
     reverseBtn.className = "";
-    reverseBtn.innerText = "Use Reverse (once)";
+    reverseBtn.innerText = "Reverse Mode";
   }
 }
 
@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
     endBtn.addEventListener('click', endTurn);
     console.log("endTurn event listener added");
   }
-  document.getElementById('drawBtn').addEventListener('click', drawCard);
+  document.getElementById('drawPile').addEventListener('click', drawCard);
   document.getElementById('reverseBtn').addEventListener('click', useReverse);
 });
 
