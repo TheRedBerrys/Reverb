@@ -24,7 +24,7 @@
     .stat-label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
     .stat-value{font-size:32px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
     .app{display:grid;grid-template-columns:1fr;gap:20px}
-    .panel{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+    .panel{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.6);width:100%;border:1px solid rgba(255,255,255,0.15);box-sizing:border-box}
     .topbar{display:flex;gap:var(--gap);align-items:center;margin-bottom:var(--gap)}
     button{background:#0ea5a0;border:none;padding:8px 10px;border-radius:8px;color:#042027;cursor:pointer}
     button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
@@ -94,7 +94,7 @@
 
     /* Large screens */
     @media (min-width: 1024px) {
-      .app{grid-template-columns:1fr 420px}
+      .app{grid-template-columns:1fr}
       :root{
         --card-width:125px;
         --card-height:175px;
