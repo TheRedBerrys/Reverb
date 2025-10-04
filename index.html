@@ -234,6 +234,23 @@
       pointer-events: none;
     }
 
+    .controls .tooltip-container .card-tooltip {
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-left: 0;
+      margin-top: 8px;
+      width: 280px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: normal;
+    }
+
+    .controls .tooltip-container .card-tooltip p {
+      margin: 0;
+    }
+
     .card-tooltip img {
       width: calc(var(--card-width) * 0.8);
       height: calc(var(--card-height) * 0.8);
@@ -242,6 +259,67 @@
 
     .tooltip-container:hover .card-tooltip {
       display: block;
+    }
+
+    /* Help icon styles */
+    .help-icon {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      text-align: center;
+      line-height: 32px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: help;
+      margin-left: 8px;
+      position: relative;
+    }
+
+    .help-tooltip {
+      display: none;
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      z-index: 1000;
+      width: 280px;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    .help-icon:hover .help-tooltip {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .help-icon {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .help-icon {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 14px;
+      }
+      .help-tooltip {
+        width: 200px;
+        font-size: 11px;
+      }
     }
   </style>
 </head>
@@ -258,8 +336,27 @@
       <div class="stat-value" id="turns">0</div>
     </div>
     <div class="stat-item">
-      <div class="stat-label">Best Score</div>
+      <div class="stat-label">
+        Best Score
+      </div>
       <div class="stat-value" id="bestScore">--</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">How to play</div>
+      <span class="help-icon">?
+          <div class="help-tooltip">
+            <strong>How to Play:</strong><br>
+            <p>
+            Each card has two items. You may play any card that matches either of the items on the last card.
+            </p>
+            <p>
+            If one item matches the last card and the other item matches the next-to-last card, you can continue your turn.
+            </p>
+            <p>
+            Your score is the number of turns it takes you to empty your hand 3 times. Try to beat your lowest score!
+            </p>
+          </div>
+      </span>
     </div>
   </div>
 
@@ -288,9 +385,27 @@
         </div>
 
         <div class="controls">
-          <button id="drawBtn" class="secondary">Draw (take 1)</button>
-          <button id="reverseBtn">Use Reverse (once)</button>
-          <button id="endBtn" class="secondary">End Turn</button>
+          <span class="tooltip-container">
+          <button id="drawBtn">Draw</button>
+            <div class="card-tooltip">
+            <p>
+            Take the top card of the draw pile into your hand.
+            </p></div>
+          </span>
+          <span class="tooltip-container">
+            <button id="reverseBtn">Reverse Mode</button>
+            <div class="card-tooltip">
+            <p>
+            Reverse mode allows you to play a card if it <i>doesn't</i> match the last card, and continue if it also <i>doesn't</i> match the next-to-last card.
+            </p></div>
+          </span>
+          <span class="tooltip-container">
+            <button id="endBtn">End Turn</button>
+            <div class="card-tooltip">
+            <p>
+            The top card of the draw pile will be placed at the end of the play queue.
+            </p></div>
+          </span>
         </div>
       </div>
     </div>
