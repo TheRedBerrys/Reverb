@@ -495,6 +495,15 @@ function render() {
   updateCounterWithAnimation("comps", completions);
   document.getElementById("drawCount").innerText = deck.length;
 
+  // Update draw pile tooltip with top card image
+  const drawPileTooltip = document.getElementById("drawPileTooltip");
+  if (deck.length > 0) {
+    const topCard = deck[deck.length - 1];
+    drawPileTooltip.innerHTML = `<img src="${topCard.img}" alt="Top card">`;
+  } else {
+    drawPileTooltip.innerHTML = "";
+  }
+
   // Update best score display
   const bestScoreElement = document.getElementById("bestScore");
   if (bestScore === null) {

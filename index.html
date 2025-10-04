@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <title>Reverb</title>
   <style>
     :root{
@@ -213,6 +214,35 @@
     .fadeOut {
       animation: fadeOut 0.3s ease-out forwards;
     }
+
+    /* Tooltip styles */
+    .tooltip-container {
+      position: relative;
+    }
+
+    .card-tooltip {
+      display: none;
+      position: absolute;
+      top: -10px;
+      left: 100%;
+      margin-left: 10px;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .card-tooltip img {
+      width: calc(var(--card-width) * 0.5);
+      height: calc(var(--card-height) * 0.5);
+      border-radius: 6px;
+    }
+
+    .tooltip-container:hover .card-tooltip {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -239,9 +269,10 @@
         <div class="queue">
           <div class="draw-pile-container">
             <div class="small muted">Draw pile</div>
-            <div id="drawPile" class="card" style="display:flex;align-items:center;justify-content:center;position:relative">
+            <div id="drawPile" class="card tooltip-container" style="display:flex;align-items:center;justify-content:center;position:relative">
               <img src="images/back.png" class="card-img" style="position:absolute;top:0;left:0">
               <span id="drawCount" style="position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,0.7);color:#fff;padding:2px 6px;border-radius:3px;font-size:12px">0</span>
+              <div id="drawPileTooltip" class="card-tooltip"></div>
             </div>
           </div>
 
