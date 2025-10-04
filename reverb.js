@@ -464,6 +464,112 @@ function renderWithoutTurnsUpdate() {
   }
 }
 
+function getCardTooltip(card) {
+  const last = queue[queue.length - 1];
+  if (!last) return "No card to match";
+
+  const canPlayCard = canPlay(card);
+
+  if (!canPlayCard) {
+    // Card cannot be played
+    if (!reverseMode) {
+      return "❌ Cannot play - no match with last card.";
+    } else {
+      return "❌ Cannot play - matches last card (reverse mode).";
+    }
+  }
+
+  // Card can be played - check if it's a double match (allows turn to continue)
+  if (queue.length >= 2) {
+    const willBeDoubleMatch = isDoubleMatchPreview(card);
+
+    if (willBeDoubleMatch) {
+      if (reverseMode) {
+        return "Allows turn to continue - double non-match! (reverse mode)";
+      } else {
+        return "Allows turn to continue - double match!";
+      }
+    } else {
+      // Find which item causes turn to end
+      const prevPrev = queue[queue.length - 2];
+      const explanation = reverseMode ?
+        getReverseMatchExplanation(card, prevPrev) :
+        getNoMatchExplanation(card, prevPrev);
+      return `Can play but ends turn. ${explanation}.`;
+    }
+  } else {
+    return "Can play, but ends turn.";
+  }
+}
+
+function formatItemName(item) {
+  if (item === "w") return "Wild";
+  if (item === "n") return "Null";
+  if (item === "d") return "Draw";
+  return item;
+}
+
+function getReverseMatchExplanation(card, prevPrev) {
+  // In reverse mode, explain which part DOES match (causing turn to end)
+  const topMatchesPrevPrev = matchItem(card.top, prevPrev.top) || matchItem(card.top, prevPrev.bottom);
+  const bottomMatchesPrevPrev = matchItem(card.bottom, prevPrev.top) || matchItem(card.bottom, prevPrev.bottom);
+
+  const cardTopName = formatItemName(card.top);
+  const cardBottomName = formatItemName(card.bottom);
+  const prevPrevTopName = formatItemName(prevPrev.top);
+  const prevPrevBottomName = formatItemName(prevPrev.bottom);
+
+  if (topMatchesPrevPrev && bottomMatchesPrevPrev) {
+    return `Both ${cardTopName} and ${cardBottomName} match ${prevPrevTopName} or ${prevPrevBottomName}`;
+  } else if (topMatchesPrevPrev) {
+    return `${cardTopName} matches ${prevPrevTopName} or ${prevPrevBottomName}`;
+  } else if (bottomMatchesPrevPrev) {
+    return `${cardBottomName} matches ${prevPrevTopName} or ${prevPrevBottomName}`;
+  }
+
+  return "";
+}
+
+function getNoMatchExplanation(card, prevPrev) {
+  // Determine which part of the card doesn't match prevPrev
+  const topMatchesPrevPrev = matchItem(card.top, prevPrev.top) || matchItem(card.top, prevPrev.bottom);
+  const bottomMatchesPrevPrev = matchItem(card.bottom, prevPrev.top) || matchItem(card.bottom, prevPrev.bottom);
+
+  const cardTopName = formatItemName(card.top);
+  const cardBottomName = formatItemName(card.bottom);
+  const prevPrevTopName = formatItemName(prevPrev.top);
+  const prevPrevBottomName = formatItemName(prevPrev.bottom);
+
+  if (!topMatchesPrevPrev && !bottomMatchesPrevPrev) {
+    return `Neither ${cardTopName} nor ${cardBottomName} match ${prevPrevTopName} or ${prevPrevBottomName}`;
+  } else if (!topMatchesPrevPrev) {
+    return `${cardTopName} does not match ${prevPrevTopName} or ${prevPrevBottomName}`;
+  } else if (!bottomMatchesPrevPrev) {
+    return `${cardBottomName} does not match ${prevPrevTopName} or ${prevPrevBottomName}`;
+  }
+
+  return "";
+}
+
+function isDoubleMatchPreview(card) {
+  // Preview what isDoubleMatch would return if this card were played
+  if (queue.length < 2) return false;
+
+  const prevPrev = queue[queue.length - 2];
+  const prev = queue[queue.length - 1];
+
+  const topMatchesPrev = matchItem(card.top, prev.top) || matchItem(card.top, prev.bottom);
+  const topMatchesPrevPrev = matchItem(card.top, prevPrev.top) || matchItem(card.top, prevPrev.bottom);
+  const bottomMatchesPrev = matchItem(card.bottom, prev.top) || matchItem(card.bottom, prev.bottom);
+  const bottomMatchesPrevPrev = matchItem(card.bottom, prevPrev.top) || matchItem(card.bottom, prevPrev.bottom);
+
+  if (reverseMode) {
+    return !(topMatchesPrev || topMatchesPrevPrev || bottomMatchesPrev || bottomMatchesPrevPrev);
+  } else {
+    return (topMatchesPrev && bottomMatchesPrevPrev) || (bottomMatchesPrev && topMatchesPrevPrev);
+  }
+}
+
 function completeTurnWithCardRemoval() {
   // First render to show the new card that was drawn to the queue (without updating turns counter)
   renderWithoutTurnsUpdate();
@@ -483,7 +589,10 @@ function completeTurnWithCardRemoval() {
 
 function render() {
   document.getElementById("hand").innerHTML = hand
-    .map((c, i) => `<img src="${c.img}" class="card" onclick="playCard(${i})">`)
+    .map((c, i) => {
+      const tooltip = getCardTooltip(c);
+      return `<img src="${c.img}" class="card" onclick="playCard(${i})" title="${tooltip}">`;
+    })
     .join("");
 
   // Update played queue to show all cards
